@@ -22,7 +22,7 @@ export default function AudioTranscriber() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const uploadRes = await fetch(`${API_URL}/transcribe`, {
+      const uploadRes = await fetch(`${API_URL}/api/v1/transcribe/`, {
         method: "POST",
         body: formData,
       });
@@ -34,7 +34,7 @@ export default function AudioTranscriber() {
 
       // 2. Poll for result
       const poll = async (): Promise<string> => {
-        const res = await fetch(`${API_URL}/status/${job_id}`);
+        const res = await fetch(`${API_URL}/api/v1/transcribe/status/${job_id}`);
         const data = await res.json();
 
         if (data.status === "completed") return data.result;
