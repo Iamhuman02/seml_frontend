@@ -10,15 +10,16 @@ export default function AudioTranscriber() {
   const [isUploading, setIsUploading] = useState(false);
   const [subtitle, setSubtitle] = useState<string | null>(null);
   const [statusMsg, setStatusMsg] = useState<string>("");
+  const [progress, setProgress] = useState<number>(0);
 
   const handleTranscribe = async () => {
     if (!file) return;
     setIsUploading(true);
     setSubtitle(null);
+    setProgress(0);
     setStatusMsg("Uploading audio…");
 
     try {
-      // 1. Submit audio file
       const formData = new FormData();
       formData.append("file", file);
 
@@ -36,23 +37,43 @@ export default function AudioTranscriber() {
       const poll = async (): Promise<string> => {
         const res = await fetch(`${API_URL}/api/v1/transcribe/status/${job_id}`);
         const data = await res.json();
+        
+        // Hybrid Progress: Blend real progress with optimistic UI for short files
+        if (data.status !== "completed") {
+          setProgress((prev) => {
+            const apiProg = data.progress || 0;
+            // Optimistic fake bump so it never freezes
+            const increment = prev < 30 ? Math.random() * 5 : prev < 70 ? Math.random() * 2 : Math.random() * 0.5;
+            const simulatedProg = prev + increment;
+            
+            // Take the highest value but cap at 95% until actually complete
+            return Math.min(95, Math.max(simulatedProg, apiProg));
+          });
+        }
 
-        if (data.status === "completed") return data.result;
+        if (data.status === "completed") {
+           setProgress(100);
+           return data.result;
+        }
         if (data.status === "failed") throw new Error(data.error || "Transcription failed");
 
-        // Wait 3s then poll again
-        await new Promise((r) => setTimeout(r, 3000));
+        await new Promise((r) => setTimeout(r, 1000));
         return poll();
       };
 
       const result = await poll();
-      setSubtitle(result);
+      
+      setTimeout(() => setSubtitle(result), 600);
+      
     } catch (err: unknown) {
+      setProgress(0);
       const message = err instanceof Error ? err.message : "Unknown error";
       alert(`Error: ${message}`);
     } finally {
-      setIsUploading(false);
-      setStatusMsg("");
+      setTimeout(() => {
+        setIsUploading(false);
+        setStatusMsg("");
+      }, 600);
     }
   };
 
@@ -176,9 +197,17 @@ export default function AudioTranscriber() {
                 )}
                 
                 {isUploading && (
-                  <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] flex flex-col items-center justify-center z-20">
-                    <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-3" />
-                    <p className="text-blue-700 font-semibold animate-pulse">{statusMsg || "AI Processing…"}</p>
+                  <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] flex flex-col items-center justify-center z-20 px-8">
+                    <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-4" />
+                    <p className="text-blue-700 font-semibold animate-pulse mb-6">{statusMsg || "AI Processing…"}</p>
+                    
+                    <div className="w-full max-w-md bg-gray-200 rounded-full h-2.5 mb-2 overflow-hidden shadow-inner">
+                      <div 
+                        className="bg-blue-600 h-2.5 rounded-full transition-all duration-1000 ease-out"
+                        style={{ width: `${progress}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-sm text-gray-500 font-medium">{Math.round(progress)}%</p>
                   </div>
                 )}
 
