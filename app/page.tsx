@@ -157,8 +157,8 @@ export default function AudioTranscriber() {
   };
 
   return (
-    <div className="h-screen bg-gray-50 p-8 overflow-hidden flex flex-col">
-      <div className="max-w-400">
+    <div className="min-h-screen bg-gray-50 p-4 lg:p-8 overflow-y-auto flex flex-col">
+      <div className="w-full max-w-7xl mx-auto flex flex-col">
 
         {/* Header - Simple & Clean */}
         <header className="mb-6 flex justify-between items-center">
@@ -288,9 +288,8 @@ export default function AudioTranscriber() {
             </div>
           </section>
 
-          {/* Column Right: Output Section (Larger & Full Height) */}
-          <section className="lg:col-span-8 xl:col-span-9">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col h-full min-h-150 lg:h-[calc(100vh-120px)]">
+          <section className="lg:col-span-8 xl:col-span-9 flex flex-col">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col min-h-[500px] lg:h-[calc(100vh-120px)]">
 
               {/* Toolbar */}
               <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
