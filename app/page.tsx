@@ -180,12 +180,13 @@ export default function AudioTranscriber() {
                 Audio Input
               </h2>
 
-              <div className="relative group border-2 border-dashed border-gray-200 rounded-xl p-6 hover:border-blue-400 hover:bg-blue-50/30 transition-all text-center">
+              <div className={`relative group border-2 border-dashed border-gray-200 rounded-xl p-6 transition-all text-center ${isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:border-blue-400 hover:bg-blue-50/30 cursor-pointer'}`}>
                 <input
                   type="file"
                   accept="audio/*"
                   onChange={(e) => e.target.files?.[0] && setFile(e.target.files[0])}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  disabled={isUploading}
+                  className={`absolute inset-0 w-full h-full opacity-0 ${isUploading ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 />
                 <Upload className="w-8 h-8 text-gray-300 mx-auto mb-2 group-hover:text-blue-500 transition-colors" />
                 <p className="text-sm text-gray-600 font-medium">Choose file</p>
@@ -207,12 +208,12 @@ export default function AudioTranscriber() {
                         a.click();
                         window.URL.revokeObjectURL(url);
                       }}
-                      className="text-blue-500 hover:text-blue-700 transition-colors"
+                      className="text-blue-500 hover:text-blue-700 transition-colors cursor-pointer"
                       title="Download Audio"
                     >
                       <Download className="w-4 h-4" />
                     </button>
-                    <button onClick={() => setFile(null)} className="text-gray-400 hover:text-red-500 transition-colors">
+                    <button onClick={() => setFile(null)} disabled={isUploading} className={`transition-colors ${isUploading ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-red-500 cursor-pointer'}`}>
                       <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -231,7 +232,7 @@ export default function AudioTranscriber() {
                 <button
                   onClick={startRecording}
                   disabled={isUploading}
-                  className="w-full py-3 rounded-xl font-semibold text-white shadow-sm transition-all flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 disabled:bg-gray-300"
+                  className="w-full py-3 rounded-xl font-semibold text-white shadow-sm transition-all flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <Mic className="w-4 h-4" />
                   <span>Start Recording</span>
@@ -249,7 +250,7 @@ export default function AudioTranscriber() {
                     {isPaused ? (
                       <button
                         onClick={resumeRecording}
-                        className="flex-1 py-2.5 rounded-xl font-semibold text-white bg-amber-500 hover:bg-amber-600 transition-all flex items-center justify-center gap-1.5 text-sm"
+                        className="flex-1 py-2.5 rounded-xl font-semibold text-white bg-amber-500 hover:bg-amber-600 transition-all flex items-center justify-center gap-1.5 text-sm cursor-pointer"
                       >
                         <Play className="w-3.5 h-3.5 fill-current" />
                         Resume
@@ -257,7 +258,7 @@ export default function AudioTranscriber() {
                     ) : (
                       <button
                         onClick={pauseRecording}
-                        className="flex-1 py-2.5 rounded-xl font-semibold text-white bg-amber-500 hover:bg-amber-600 transition-all flex items-center justify-center gap-1.5 text-sm"
+                        className="flex-1 py-2.5 rounded-xl font-semibold text-white bg-amber-500 hover:bg-amber-600 transition-all flex items-center justify-center gap-1.5 text-sm cursor-pointer"
                       >
                         <Pause className="w-3.5 h-3.5" />
                         Pause
@@ -265,7 +266,7 @@ export default function AudioTranscriber() {
                     )}
                     <button
                       onClick={stopRecording}
-                      className="flex-1 py-2.5 rounded-xl font-semibold text-white bg-gray-700 hover:bg-gray-800 transition-all flex items-center justify-center gap-1.5 text-sm"
+                      className="flex-1 py-2.5 rounded-xl font-semibold text-white bg-gray-700 hover:bg-gray-800 transition-all flex items-center justify-center gap-1.5 text-sm cursor-pointer"
                     >
                       <Square className="w-3.5 h-3.5 fill-current" />
                       Stop
@@ -277,7 +278,7 @@ export default function AudioTranscriber() {
               <button
                 onClick={handleTranscribe}
                 disabled={!file || isUploading}
-                className={`w-full mt-6 py-3 rounded-xl font-bold text-white shadow-sm transition-all flex items-center justify-center gap-2 ${isUploading ? 'bg-gray-300' : 'bg-blue-600 hover:bg-blue-700'
+                className={`w-full mt-6 py-3 rounded-xl font-bold text-white shadow-sm transition-all flex items-center justify-center gap-2 ${(!file || isUploading) ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'
                   }`}
               >
                 {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-current" />}
@@ -309,13 +310,13 @@ export default function AudioTranscriber() {
                           alert("Cannot access Clipboard");
                         }
                       }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                     >
                       <Copy className="w-3.5 h-3.5" /> Copy
                     </button>
                     <button
                       onClick={downloadSRT}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-green-50 text-green-700 hover:bg-green-100 rounded-lg transition-colors border border-green-200"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-green-50 text-green-700 hover:bg-green-100 rounded-lg transition-colors border border-green-200 cursor-pointer"
                     >
                       <Download className="w-3.5 h-3.5" /> Download .SRT
                     </button>
